@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.rabbit</groupId>
+	<artifactId>zeronoise</artifactId>
+	<version>1.0</version>
+	<description>		</description>
+	<repositories>
+		<repository>
+			<id>Clojure-Repo</id>
+			<name>Clojure Repository</name>
+			<url>https://clojars.org/repo</url>
+		</repository>
+	</repositories>
+	<build>
+		<finalName>ZeroNoise-Recorder</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>com.rabbit.zeronoise.Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/hellonico/speech-recognition -->
+		<dependency>
+			<groupId>hellonico</groupId>
+			<artifactId>speech-recognition</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+	</dependencies>
+</project>
