@@ -1,0 +1,14 @@
+
+
+Version:	3.12
+CmdLine:	C:\ws\zeronoise\releases\zeronoise-recorder-v1.2.exe --l4j-debug
+WOW64:		yes
+Working dir:	C:\ws\zeronoise\releases\.
+Java min ver:	1.008.000
+Java max ver:	1.011.000
+Bundled JRE:	C:\Program Files\Java\jre1.8.0_152
+Check launcher:	C:\Program Files\Java\jre1.8.0_152\bin\javaw.exe (OK)
+Launcher:	C:\Program Files\Java\jre1.8.0_152\bin\javaw.exe
+Launcher args:	-jar "C:\ws\zeronoise\releases\zeronoise-recorder-v1.2.exe"
+Args length:	59/32768 chars
+Exit code:	0

@@ -17,7 +17,6 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -39,7 +38,7 @@ public class Main extends Application {
 		final Button stopButton = new Button("Stop");
 		final Label statusLabel = new Label("Ready");
 		final ListView<String> listView = new ListView<String>();
-		final VBox vbox = new VBox(listView);
+		final VBox vbox = new VBox(15, listView);
 		
 		startButton.setLayoutX(40);
 		startButton.setLayoutY(40);
@@ -69,7 +68,6 @@ public class Main extends Application {
 		vbox.setLayoutY(90);
 		vbox.setMinWidth(360);
 		vbox.setMaxHeight(410);
-		statusLabel.setPadding(new Insets(15, 0, 0, 0));
 
 		startButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
