@@ -3,7 +3,7 @@ Zeronoise is a voice recorder tool
 
 # Instructions for novice developers and users:
 - Switch to releases tab or navigate to https://github.com/shnmkhk/zeronoise/releases
-- Download the latest version <code>zeronoise-recorder-*.jar</code>
+- Download the latest version <code>Zeronoise-*.jar</code>
 - Double click it
 
 # Instructions for ambitious developers:
