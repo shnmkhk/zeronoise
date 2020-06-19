@@ -1,5 +1,5 @@
 # Zeronoise
-Zeronoise is a voice recorder tool
+Zeronoise is a voice recorder tool. It has inbuilt support to listen to your system audio or headphones automatically and create recordings on your machine permanently. You can look up for the previous recordings too along with the latest recording.
 
 # Instructions for novice developers and users:
 - Switch to releases tab or navigate to https://github.com/shnmkhk/zeronoise/releases
