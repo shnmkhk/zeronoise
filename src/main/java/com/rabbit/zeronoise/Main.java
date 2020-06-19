@@ -1,35 +1,44 @@
 package com.rabbit.zeronoise;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.Comparator;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
+
+import com.rabbit.zeronoise.util.ZConstants;
+import com.sun.media.jfxmedia.AudioClip;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-@SuppressWarnings("restriction")
 public class Main extends Application {
 	private AudioFormat audioFormat;
 	private TargetDataLine targetDataLine;
-	private Clip currentPlayingClip;
+	private AudioClip currentPlayingClip;
 
 	public void start(Stage primaryStage) {
 		final Button startButton = new Button("Start");
 		final Button stopButton = new Button("Stop");
 		final Button playOrStopButton = new Button("Play/ Stop");
+		final Label statusLabel = new Label("Ready");
 
 		startButton.setLayoutX(40);
 		startButton.setLayoutY(40);
@@ -42,6 +51,30 @@ public class Main extends Application {
 		playOrStopButton.setLayoutX(160);
 		playOrStopButton.setLayoutY(40);
 		playOrStopButton.setDisable(false);
+
+		ListView<String> listView = new ListView<String>();
+		listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent click) {
+				if (click.getClickCount() == 2) {
+					if (currentPlayingClip != null && currentPlayingClip.isPlaying()) {
+						currentPlayingClip.stop();
+					}
+					final String fileNameToPlay = listView.getSelectionModel().getSelectedItem() + ".wav";
+					playAudio(fileNameToPlay);
+				}
+			}
+		});
+
+		refreshRecordingsList(listView);
+		VBox vbox = new VBox(listView);
+		vbox.getChildren().add(statusLabel);
+		vbox.setLayoutX(20);
+		vbox.setLayoutY(90);
+		vbox.setMinWidth(360);
+		vbox.setMaxHeight(410);
+		statusLabel.setPadding(new Insets(15, 0, 0, 0));
 
 		startButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -61,26 +94,28 @@ public class Main extends Application {
 
 				targetDataLine.stop();
 				targetDataLine.close();
+
+				refreshRecordingsList(listView);
 			}
 		});
 
 		playOrStopButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if (currentPlayingClip != null) {
+				if (currentPlayingClip != null && currentPlayingClip.isPlaying()) {
 					currentPlayingClip.stop();
 					currentPlayingClip = null;
 				} else {
-					currentPlayingClip = playAudio();
+					playAudio(null);
 				}
 			}
 		});
 
 		Pane pane = new Pane();
 		Text text = new Text(20, 20, "Voice Recorder");
-		pane.getChildren().addAll(text, startButton, stopButton, playOrStopButton);
+		pane.getChildren().addAll(text, startButton, stopButton, playOrStopButton, vbox);
 
-		Scene scene = new Scene(pane, 400, 100);
+		Scene scene = new Scene(pane, 400, 520);
 		primaryStage.setTitle("Zero noise");
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -91,6 +126,20 @@ public class Main extends Application {
 				Platform.exit();
 			}
 		});
+	}
+	
+	private void refreshRecordingsList(ListView<String> listView) {
+		File dirToReadFrom = new File(ZConstants.SYSTEM_TEMP_DIRECTORY + File.separatorChar + "zeronoise");
+		File[] listFiles = dirToReadFrom.listFiles();
+		Arrays.sort(listFiles, new Comparator<File>() {
+			public int compare(File f1, File f2) {
+				return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+			}
+		});
+		listView.getItems().clear();
+		for (File file : listFiles) {
+			listView.getItems().add(file.getName().replaceAll(".wav", ""));
+		}
 	}
 
 	private void recordAudio() {
@@ -109,14 +158,13 @@ public class Main extends Application {
 		}
 	}
 
-	public Clip playAudio() {
+	public void playAudio(String fileNameToPlay) {
 		try {
-			PlayingThread pt = new PlayingThread();
-			return pt.call();
+			PlayingThread pt = new PlayingThread(fileNameToPlay);
+			currentPlayingClip = pt.call();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
 	}
 
 	public static void main(String[] args) {
