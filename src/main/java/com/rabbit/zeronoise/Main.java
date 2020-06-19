@@ -39,7 +39,9 @@ public class Main extends Application {
 		final Button stopButton = new Button("Stop");
 		final Button playOrStopButton = new Button("Play/ Stop");
 		final Label statusLabel = new Label("Ready");
-
+		final ListView<String> listView = new ListView<String>();
+		final VBox vbox = new VBox(listView);
+		
 		startButton.setLayoutX(40);
 		startButton.setLayoutY(40);
 		startButton.setDisable(false);
@@ -51,8 +53,7 @@ public class Main extends Application {
 		playOrStopButton.setLayoutX(160);
 		playOrStopButton.setLayoutY(40);
 		playOrStopButton.setDisable(false);
-
-		ListView<String> listView = new ListView<String>();
+		
 		listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
 			@Override
@@ -68,7 +69,6 @@ public class Main extends Application {
 		});
 
 		refreshRecordingsList(listView);
-		VBox vbox = new VBox(listView);
 		vbox.getChildren().add(statusLabel);
 		vbox.setLayoutX(20);
 		vbox.setLayoutY(90);
