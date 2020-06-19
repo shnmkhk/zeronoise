@@ -37,7 +37,6 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		final Button startButton = new Button("Start");
 		final Button stopButton = new Button("Stop");
-		final Button playOrStopButton = new Button("Play/ Stop");
 		final Label statusLabel = new Label("Ready");
 		final ListView<String> listView = new ListView<String>();
 		final VBox vbox = new VBox(listView);
@@ -50,10 +49,6 @@ public class Main extends Application {
 		stopButton.setLayoutY(40);
 		stopButton.setDisable(true);
 
-		playOrStopButton.setLayoutX(160);
-		playOrStopButton.setLayoutY(40);
-		playOrStopButton.setDisable(false);
-		
 		listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
 			@Override
@@ -99,21 +94,9 @@ public class Main extends Application {
 			}
 		});
 
-		playOrStopButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				if (currentPlayingClip != null && currentPlayingClip.isPlaying()) {
-					currentPlayingClip.stop();
-					currentPlayingClip = null;
-				} else {
-					playAudio(null);
-				}
-			}
-		});
-
 		Pane pane = new Pane();
 		Text text = new Text(20, 20, "Voice Recorder");
-		pane.getChildren().addAll(text, startButton, stopButton, playOrStopButton, vbox);
+		pane.getChildren().addAll(text, startButton, stopButton, vbox);
 
 		Scene scene = new Scene(pane, 400, 520);
 		primaryStage.setTitle("Zero noise");
