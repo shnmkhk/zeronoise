@@ -14,4 +14,6 @@ Zeronoise is a voice recorder tool. It has inbuilt support to listen to your sys
 - You should find <code>zeronoise-recorder-*.jar</code> in target directory
 - Either double click it or run using <code>java -jar target/zeronoise-recorder-*.jar</code>; and you should see the application opened as shown below
 
+# Application shows up like this with latest code:
+
 ![github-large](screenshots/ZeroNoise-1.3.png)
