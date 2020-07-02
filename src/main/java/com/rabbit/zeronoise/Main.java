@@ -43,15 +43,48 @@ public class Main extends Application {
 	private AudioFormat audioFormat;
 	private TargetDataLine targetDataLine;
 	private AudioClip currentPlayingClip;
+	
+	final Label statusLabel = new Label("Ready");
+	final Button startButton = new Button("Record (R)");
+	final Button stopButton = new Button("Stop (S)");
+	final Button playLatestButton = new Button("Play latest record (P)");
+	final ListView<String> listView = new ListView<String>();
+	final VBox vbox = new VBox(15, listView);
+	
+	public void startRecord() {
+		stopPlayback();
+		stopRecord();
+		
+		this.statusLabel.setText("Recording");
+		recordAudio();
+	}
+	
+	public void stopRecord() {
+		if(targetDataLine != null){
+			targetDataLine.stop();
+			targetDataLine.close();
+		}
+		
+		this.statusLabel.setText("Ready");
+		refreshRecordingsList(listView);
+	}
+	
+	public void startPlayback() {
+		final String fileNameToPlay = listView.getSelectionModel().getSelectedItem() + ".wav";
+		playAudio(fileNameToPlay);
+		this.statusLabel.setText("Playing back");
+	}
+	
+	public boolean stopPlayback() {
+		this.statusLabel.setText("Ready");
+		if (currentPlayingClip != null && currentPlayingClip.isPlaying()) {
+			currentPlayingClip.stop();
+			return true;
+		}
+		return false;
+	}
 
 	public void start(Stage primaryStage) {
-		final Button startButton = new Button("Record (R)");
-		final Button stopButton = new Button("Stop (S)");
-		final Button playLatestButton = new Button("Play latest record (P)");
-		final Label statusLabel = new Label("Ready");
-		final ListView<String> listView = new ListView<String>();
-		final VBox vbox = new VBox(15, listView);
-		
 		startButton.setLayoutX(20);
 		startButton.setLayoutY(40);
 		startButton.setDisable(false);
@@ -68,24 +101,17 @@ public class Main extends Application {
 			public void handle(KeyEvent event) {
 				if (!event.getCode().equals(KeyCode.ENTER) && 
 						!event.getCode().equals(KeyCode.SPACE)) return;
-				if (currentPlayingClip != null && currentPlayingClip.isPlaying()) {
-					currentPlayingClip.stop();
-				}
-				final String fileNameToPlay = listView.getSelectionModel().getSelectedItem() + ".wav";
-				playAudio(fileNameToPlay);
+				stopPlayback();
+				startPlayback();
 			};
 		});
 		
 		listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
 			@Override
 			public void handle(MouseEvent click) {
 				if (click.getClickCount() == 2) {
-					if (currentPlayingClip != null && currentPlayingClip.isPlaying()) {
-						currentPlayingClip.stop();
-					}
-					final String fileNameToPlay = listView.getSelectionModel().getSelectedItem() + ".wav";
-					playAudio(fileNameToPlay);
+					stopPlayback();
+					startPlayback();
 				}
 			}
 		});
@@ -103,7 +129,7 @@ public class Main extends Application {
 				startButton.setDisable(true);
 				stopButton.setDisable(false);
 
-				recordAudio();
+				startRecord();
 			}
 		});
 
@@ -113,10 +139,7 @@ public class Main extends Application {
 				startButton.setDisable(false);
 				stopButton.setDisable(true);
 
-				targetDataLine.stop();
-				targetDataLine.close();
-
-				refreshRecordingsList(listView);
+				stopRecord();
 			}
 		});
 		
@@ -124,11 +147,7 @@ public class Main extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 				listView.getSelectionModel().select(0);
-				if (currentPlayingClip != null && currentPlayingClip.isPlaying()) {
-					currentPlayingClip.stop();
-				}
-				final String fileNameToPlay = listView.getSelectionModel().getSelectedItem() + ".wav";
-				playAudio(fileNameToPlay);
+				if (!stopPlayback()) startPlayback();
 			}
 		});
 
@@ -158,27 +177,19 @@ public class Main extends Application {
 			startButton.setDisable(true);
 			stopButton.setDisable(false);
 
-			recordAudio();
+			startRecord();
 		});		
 		
 		scene.getAccelerators().put(S_Stop_Key, ()-> {
 			startButton.setDisable(false);
 			stopButton.setDisable(true);
 
-			targetDataLine.stop();
-			targetDataLine.close();
-
-			refreshRecordingsList(listView);
-		});		
+			stopRecord();
+		});	
 		
 		scene.getAccelerators().put(P_Play_Latest_Recording_Key, ()-> {
 			listView.getSelectionModel().select(0);
-			if (currentPlayingClip != null && currentPlayingClip.isPlaying()) {
-				currentPlayingClip.stop();
-			}
-			if (listView.getSelectionModel().getSelectedItem() == null) return;
-			final String fileNameToPlay = listView.getSelectionModel().getSelectedItem() + ".wav";
-			playAudio(fileNameToPlay);
+			startPlayback();
 		});		
 		
 		scene.getAccelerators().put(CTRL_R_Reset_Sequence_Key, ()-> {
@@ -220,7 +231,6 @@ public class Main extends Application {
 				System.out.println("User cancelled the request");
 			}
 		});	
-		
 	}
 	
 	private void refreshRecordingsList(ListView<String> listView) {
@@ -238,6 +248,7 @@ public class Main extends Application {
 	}
 
 	private void recordAudio() {
+
 		try {
 			this.audioFormat = new AudioFormat(8000.0F, 16, 1, true, false);
 			DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, audioFormat);

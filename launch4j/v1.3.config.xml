@@ -2,6 +2,16 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
+  <obj>w32api/crt2.o</obj>
+  <obj>head/guihead.o</obj>
+  <obj>head/head.o</obj>
+  <lib>w32api/libmingw32.a</lib>
+  <lib>w32api/libgcc.a</lib>
+  <lib>w32api/libmsvcrt.a</lib>
+  <lib>w32api/libkernel32.a</lib>
+  <lib>w32api/libuser32.a</lib>
+  <lib>w32api/libadvapi32.a</lib>
+  <lib>w32api/libshell32.a</lib>
   <jar>C:\ws\zeronoise\target\ZeroNoise-Recorder.jar</jar>
   <outfile>C:\ws\zeronoise\releases\zeronoise-recorder-v1.3.exe</outfile>
   <errTitle></errTitle>
@@ -13,14 +23,37 @@
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon></icon>
+  <icon>C:\ws\zeronoise\src\main\resources\record.ico</icon>
+  <classPath>
+    <mainClass>com.rabbit.zeronoise.Main</mainClass>
+    <cp>speech-recognition-1.0.2.jar</cp>
+    <cp>clojure-1.5.1.jar</cp>
+    <cp>java-flac-encoder-0.2.3.jar</cp>
+    <cp>clj-http-0.7.2.jar</cp>
+    <cp>httpcore-4.2.4.jar</cp>
+    <cp>httpclient-4.2.3.jar</cp>
+    <cp>commons-logging-1.1.1.jar</cp>
+    <cp>httpmime-4.2.3.jar</cp>
+    <cp>commons-codec-1.7.jar</cp>
+    <cp>commons-io-2.4.jar</cp>
+    <cp>slingshot-0.10.3.jar</cp>
+    <cp>cheshire-5.1.1.jar</cp>
+    <cp>jackson-core-2.1.4.jar</cp>
+    <cp>jackson-dataformat-smile-2.1.4.jar</cp>
+    <cp>crouton-0.1.1.jar</cp>
+    <cp>jsoup-1.7.1.jar</cp>
+    <cp>tools.reader-0.7.3.jar</cp>
+    <cp>fs-1.0.0.jar</cp>
+    <cp>commons-compress-1.3.jar</cp>
+    <cp>data.json-0.1.1.jar</cp>
+  </classPath>
   <jre>
-    <path>C:\Program Files\Java\jre1.8.0_152</path>
+    <path>C:\ws\zeronoise\target\jre</path>
     <bundledJre64Bit>true</bundledJre64Bit>
     <bundledJreAsFallback>false</bundledJreAsFallback>
     <minVersion>1.8</minVersion>
     <maxVersion>11</maxVersion>
     <jdkPreference>preferJre</jdkPreference>
-    <runtimeBits>64/32</runtimeBits>
+    <runtimeBits>32</runtimeBits>
   </jre>
 </launch4jConfig>
