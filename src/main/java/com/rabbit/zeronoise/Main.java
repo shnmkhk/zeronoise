@@ -13,6 +13,8 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.rabbit.zeronoise.util.ZConstants;
 import com.sun.media.jfxmedia.AudioClip;
 
@@ -50,6 +52,7 @@ public class Main extends Application {
 	final Button playLatestButton = new Button("Play latest record (P)");
 	final ListView<String> listView = new ListView<String>();
 	final VBox vbox = new VBox(15, listView);
+	private String latestRecordingName;
 	
 	public void startRecord() {
 		stopPlayback();
@@ -70,7 +73,9 @@ public class Main extends Application {
 	}
 	
 	public void startPlayback() {
-		final String fileNameToPlay = listView.getSelectionModel().getSelectedItem() + ".wav";
+		final String selectedItemName = listView.getSelectionModel().getSelectedItem();
+		final String fileNameToPlay = StringUtils.isNotEmpty(selectedItemName) ? selectedItemName + ".wav":  (StringUtils.isNotEmpty(latestRecordingName) ? latestRecordingName + ".wav": null);
+		System.out.println("[DEBUG] Playing " + fileNameToPlay);
 		playAudio(fileNameToPlay);
 		this.statusLabel.setText("Playing back");
 	}
@@ -101,8 +106,7 @@ public class Main extends Application {
 			public void handle(KeyEvent event) {
 				if (!event.getCode().equals(KeyCode.ENTER) && 
 						!event.getCode().equals(KeyCode.SPACE)) return;
-				stopPlayback();
-				startPlayback();
+				if (!stopPlayback()) startPlayback();
 			};
 		});
 		
@@ -110,8 +114,7 @@ public class Main extends Application {
 			@Override
 			public void handle(MouseEvent click) {
 				if (click.getClickCount() == 2) {
-					stopPlayback();
-					startPlayback();
+					if (!stopPlayback()) startPlayback();
 				}
 			}
 		});
@@ -128,6 +131,7 @@ public class Main extends Application {
 			public void handle(ActionEvent e) {
 				startButton.setDisable(true);
 				stopButton.setDisable(false);
+				playLatestButton.setDisable(true);
 
 				startRecord();
 			}
@@ -138,6 +142,7 @@ public class Main extends Application {
 			public void handle(ActionEvent e) {
 				startButton.setDisable(false);
 				stopButton.setDisable(true);
+				playLatestButton.setDisable(false);
 
 				stopRecord();
 			}
@@ -171,11 +176,13 @@ public class Main extends Application {
 		KeyCombination R_Record_Key = new KeyCodeCombination(KeyCode.R);
 		KeyCombination S_Stop_Key = new KeyCodeCombination(KeyCode.S);
 		KeyCombination P_Play_Latest_Recording_Key = new KeyCodeCombination(KeyCode.P);
+		KeyCombination CTRL_F5_Refresh_Recordings = new KeyCodeCombination(KeyCode.F5);
 		KeyCombination CTRL_R_Reset_Sequence_Key = new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN);
-		KeyCombination CTRL_D_Reset_Sequence_Key = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+		KeyCombination CTRL_D_Delete_All_Recordings = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
 		scene.getAccelerators().put(R_Record_Key, ()-> {
 			startButton.setDisable(true);
 			stopButton.setDisable(false);
+			playLatestButton.setDisable(true);
 
 			startRecord();
 		});		
@@ -183,13 +190,14 @@ public class Main extends Application {
 		scene.getAccelerators().put(S_Stop_Key, ()-> {
 			startButton.setDisable(false);
 			stopButton.setDisable(true);
+			playLatestButton.setDisable(false);
 
 			stopRecord();
 		});	
 		
 		scene.getAccelerators().put(P_Play_Latest_Recording_Key, ()-> {
 			listView.getSelectionModel().select(0);
-			startPlayback();
+			if (!stopPlayback()) startPlayback();
 		});		
 		
 		scene.getAccelerators().put(CTRL_R_Reset_Sequence_Key, ()-> {
@@ -198,7 +206,12 @@ public class Main extends Application {
 			System.out.println("Sequence has been reset to zero");
 		});	
 		
-		scene.getAccelerators().put(CTRL_D_Reset_Sequence_Key, ()-> {
+		scene.getAccelerators().put(CTRL_F5_Refresh_Recordings, ()-> {
+			refreshRecordingsList(listView);
+			System.out.println("Sequence has been reset to zero");
+		});	
+		
+		scene.getAccelerators().put(CTRL_D_Delete_All_Recordings, ()-> {
 			File recordingsDir = new File(ZConstants.SYSTEM_TEMP_DIRECTORY + File.separatorChar + "zeronoise");
 			if (!recordingsDir.exists()) {
 				System.out.println("No records found to delete");
@@ -236,12 +249,15 @@ public class Main extends Application {
 	private void refreshRecordingsList(ListView<String> listView) {
 		File dirToReadFrom = new File(ZConstants.SYSTEM_TEMP_DIRECTORY + File.separatorChar + "zeronoise");
 		File[] listFiles = dirToReadFrom.listFiles();
+		listView.getItems().clear();
+		latestRecordingName = null;
+		if (listFiles == null || listFiles.length == 0) return;
 		Arrays.sort(listFiles, new Comparator<File>() {
 			public int compare(File f1, File f2) {
 				return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
 			}
 		});
-		listView.getItems().clear();
+		latestRecordingName = listFiles[0].getName();
 		for (File file : listFiles) {
 			listView.getItems().add(file.getName().replaceAll(".wav", ""));
 		}
@@ -265,6 +281,7 @@ public class Main extends Application {
 	}
 
 	public void playAudio(String fileNameToPlay) {
+		if (fileNameToPlay == null) return;
 		try {
 			PlayingThread pt = new PlayingThread(fileNameToPlay);
 			currentPlayingClip = pt.call();

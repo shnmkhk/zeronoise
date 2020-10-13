@@ -20,8 +20,8 @@
   <priority>normal</priority>
   <downloadUrl>http://java.com/download</downloadUrl>
   <supportUrl></supportUrl>
-  <stayAlive>false</stayAlive>
-  <restartOnCrash>false</restartOnCrash>
+  <stayAlive>true</stayAlive>
+  <restartOnCrash>true</restartOnCrash>
   <manifest></manifest>
   <icon>C:\ws\zeronoise\src\main\resources\record.ico</icon>
   <classPath>
